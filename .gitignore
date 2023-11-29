@@ -34,6 +34,7 @@ build/
 .vscode/
 
 ### bot ###
+.simbot
 cache/
 device.json
 !**/src/main/resources/config/
