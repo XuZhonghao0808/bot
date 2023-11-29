@@ -1,0 +1,11 @@
+{
+  "component": "simbot.mirai",
+  "code": 123123123,
+  "authorization": {
+    "type": "qr_code"
+  },
+  "config": {
+    "loginCacheEnabled": true,
+    "protocol": "ANDROID_WATCH"
+  }
+}
