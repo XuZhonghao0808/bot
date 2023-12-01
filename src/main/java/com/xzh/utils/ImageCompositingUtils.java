@@ -35,12 +35,12 @@ public class ImageCompositingUtils {
 
     public static InputStream defProcess(String code, String defStr) throws IOException {
         // 创建一个 BufferedImage 对象
-        BufferedImage image = new BufferedImage(1300, 1400, BufferedImage.TYPE_INT_RGB);
+        BufferedImage image = new BufferedImage(1050, 1400, BufferedImage.TYPE_INT_RGB);
         Graphics2D graphics = image.createGraphics();
 
         // 设置背景色和文本颜色
         graphics.setColor(Color.WHITE);
-        graphics.fillRect(0, 0, 1300, 1400);
+        graphics.fillRect(0, 0, 1050, 1400);
         graphics.setColor(Color.BLACK);
 
         // 设置字体
@@ -106,7 +106,7 @@ public class ImageCompositingUtils {
             graphics.drawImage(lose,x + 350,y,100,100,null);
             String l = split1[1];
             graphics.drawString(l, x + 450, y + 80);
-            graphics.drawString(split1[2], x + 650, y + 80);
+//            graphics.drawString(split1[2], x + 650, y + 80);
             y += 120;
         }
         // 释放资源
