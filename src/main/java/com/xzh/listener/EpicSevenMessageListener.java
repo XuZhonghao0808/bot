@@ -149,6 +149,40 @@ public class EpicSevenMessageListener {
     }
 
     /**
+     * 防守排行
+     */
+    @Filters(value = {
+            @Filter(value = "防守排行榜", matchType = MatchType.TEXT_CONTAINS),
+    }, multiMatchType = MultiFilterMatchType.ANY)
+    @Listener
+    @ContentTrim
+    public synchronized void defRank(GroupMessageEvent groupMessageEvent) {
+        String msg = groupMessageEvent.getMessageContent().getPlainText();
+        MessagesBuilder messagesBuilder = new MessagesBuilder();
+
+        String gvgDef = EpicSevenUtils.defRank();
+        if (gvgDef == null) {
+            messagesBuilder.text("没有相关的gvg数据");
+            groupMessageEvent.replyAsync(messagesBuilder.build());
+            return;
+        }
+        //图片合成
+        try {
+            InputStream inputStream = ImageCompositingUtils.defProcess(null,gvgDef);
+            StandardResource of = Resource.of(inputStream);
+            messagesBuilder.image(of);
+//            messagesBuilder.text(gvgDef);
+            groupMessageEvent.getGroup().sendAsync(messagesBuilder.build());
+            return;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        messagesBuilder.text("生成图片失败");
+        //异步回复消息
+        groupMessageEvent.getGroup().sendAsync(messagesBuilder.build());
+    }
+
+    /**
      * xxx装备推荐
      */
     @Filters(value = {

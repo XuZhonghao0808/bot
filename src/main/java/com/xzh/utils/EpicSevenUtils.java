@@ -14,6 +14,10 @@ import java.util.stream.Collectors;
 
 public class EpicSevenUtils {
 
+    public static String defRank() {
+        return null;
+    }
+
     public static String getDef(String codes) {
         String url = "https://krivpfvxi0.execute-api.us-west-2.amazonaws.com/dev/getDef";
         String result = sendPost(url, codes);
