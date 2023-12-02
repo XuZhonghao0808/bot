@@ -26,7 +26,7 @@ public class ImageCompositingUtils {
 
     private static final BaiduOCRConfig baiduOCRConfig = new BaiduOCRConfig();
     private static final String ossPath = "https://epic-seven.oss-cn-beijing.aliyuncs.com";
-    private static final String fontName = "Arial";
+    private static final String fontName = "Songti";
     private static final int fontStyle = Font.PLAIN;
     private static final int fontSize = 14;
     private static final Color fontColor = Color.BLACK;
