@@ -16,16 +16,10 @@
 	<description>bot</description>
 	<properties>
 		<java.version>17</java.version>
-		<simbot.version>3.3.0</simbot.version>
+		<simbot.version>3.2.0</simbot.version>
 		<simbot.mirai.version>3.2.0.0</simbot.mirai.version>
 	</properties>
 	<dependencies>
-
-		<dependency>
-			<groupId>com.squareup.okhttp3</groupId>
-			<artifactId>okhttp</artifactId>
-			<version>4.10.0</version>
-		</dependency>
 
 		<!--汉语拼音-->
 		<dependency>
