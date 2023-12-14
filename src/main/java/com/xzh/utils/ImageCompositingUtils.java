@@ -20,8 +20,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import static net.sf.jsqlparser.parser.feature.Feature.set;
-
 public class ImageCompositingUtils {
 
     private static final BaiduOCRConfig baiduOCRConfig = new BaiduOCRConfig();
@@ -315,6 +313,59 @@ public class ImageCompositingUtils {
             graphics.drawString(line, 5, y);
             y += 20;
         }
+        // 释放资源
+        graphics.dispose();
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        ImageIO.write(image, "png", os);
+        return new ByteArrayInputStream(os.toByteArray());
+    }
+
+    public static InputStream tenStreaksOfMoonlight(List<String> list) throws Exception {
+        // 创建一个 BufferedImage 对象
+        BufferedImage image = new BufferedImage(1200, 500, BufferedImage.TYPE_INT_RGB);
+        Graphics2D graphics = image.createGraphics();
+
+        // 设置背景色和文本颜色
+        graphics.setColor(backgroundColor);
+        graphics.fillRect(0, 0, 1200, 500);
+        graphics.setColor(fontColor);
+
+        int x = 5;
+        int y = 100;
+        for (int i = 0; i < 10; i++) {
+            if(i==3 || i == 7){
+                y = 100;
+                x += 400;
+            }
+            String code = list.get(i);
+            URL url = new URL(ossPath+"/cachedimages/"+code+"_l.png");
+            BufferedImage bufferedImage = ImageIO.read(url);
+            int width = bufferedImage.getWidth();
+            int paddingX = (int)(width * 0.99);
+            graphics.drawImage(bufferedImage,x + paddingX,y,null);
+            y+=100;
+        }
+
+        // 释放资源
+        graphics.dispose();
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        ImageIO.write(image, "png", os);
+        return new ByteArrayInputStream(os.toByteArray());
+    }
+
+    public static InputStream streaksOfMoonlight(String heroCode) throws Exception {
+
+        // 创建一个 BufferedImage 对象
+        BufferedImage image = new BufferedImage(200, 89, BufferedImage.TYPE_INT_RGB);
+        Graphics2D graphics = image.createGraphics();
+
+        // 设置背景色和文本颜色
+        graphics.setColor(backgroundColor);
+        graphics.fillRect(0, 0, 200, 89);
+        graphics.setColor(fontColor);
+        URL url = new URL(ossPath+"/cachedimages/"+heroCode+"_l.png");
+        BufferedImage bufferedImage = ImageIO.read(url);
+        graphics.drawImage(bufferedImage,0,0,null);
         // 释放资源
         graphics.dispose();
         ByteArrayOutputStream os = new ByteArrayOutputStream();

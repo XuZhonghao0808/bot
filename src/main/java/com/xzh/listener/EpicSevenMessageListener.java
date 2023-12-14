@@ -3,6 +3,7 @@ package com.xzh.listener;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.google.common.collect.Lists;
 import com.xzh.config.BaiduOCRConfig;
 import com.xzh.entity.Artifact;
 import com.xzh.entity.Hero;
@@ -45,6 +46,91 @@ public class EpicSevenMessageListener {
 
     @Autowired
     private ArtifactService artifactService;
+
+    /**
+     * 月光召唤
+     */
+    @Filter(value = "月光召唤", matchType = MatchType.TEXT_EQUALS)
+    @Listener
+    @ContentTrim
+    public synchronized void streaksOfMoonlight(GroupMessageEvent groupMessageEvent) {
+        MessagesBuilder messagesBuilder = new MessagesBuilder();
+        List<Integer> gradeList = EpicSevenUtils.getTenStreaksOfMoonlight(1);
+        String heroByGrade = getHeroByGrade(gradeList.get(0));
+        //图片合成
+        try {
+            InputStream inputStream = ImageCompositingUtils.streaksOfMoonlight(heroByGrade);
+            messagesBuilder.image(Resource.of(inputStream));
+//            messagesBuilder.text(heroList.toString());
+            groupMessageEvent.getGroup().sendAsync(messagesBuilder.build());
+            return;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        messagesBuilder.text("生成图片失败");
+        //异步回复消息
+        groupMessageEvent.getGroup().sendAsync(messagesBuilder.build());
+    }
+
+    /**
+     * 月光十连
+     */
+    @Filter(value = "#月光十连", matchType = MatchType.TEXT_EQUALS)
+    @Listener
+    @ContentTrim
+    public synchronized void tenStreaksOfMoonlight(GroupMessageEvent groupMessageEvent) {
+        MessagesBuilder messagesBuilder = new MessagesBuilder();
+        List<Integer> gradeList = EpicSevenUtils.getTenStreaksOfMoonlight(10);
+        List<String> heroList = getHeroByGrade(gradeList);
+        //图片合成
+        try {
+            InputStream inputStream = ImageCompositingUtils.tenStreaksOfMoonlight(heroList);
+            messagesBuilder.image(Resource.of(inputStream));
+//            messagesBuilder.text(heroList.toString());
+            groupMessageEvent.getGroup().sendAsync(messagesBuilder.build());
+            return;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        messagesBuilder.text("生成图片失败");
+        //异步回复消息
+        groupMessageEvent.getGroup().sendAsync(messagesBuilder.build());
+    }
+
+    private List<String> getHeroByGrade(List<Integer> gradeList) {
+        List<String> heroList = Lists.newArrayList();
+        QueryWrapper<Hero> queryWrapper = new QueryWrapper<>();
+        queryWrapper
+                .eq("attribute_cd","dark")
+                .or()
+                .eq("attribute_cd","light");
+        List<Hero> list = heroService.list(queryWrapper);
+        gradeList.forEach(grade -> {
+            List<Hero> heroes = list.stream().filter(it -> Objects.equals(it.getGrade(), grade)).toList();
+            //随机取一个
+            if (!CollectionUtils.isEmpty(heroes)) {
+                Hero hero = heroes.get(new Random().nextInt(heroes.size()));
+                heroList.add(hero.getCode());
+            }
+        });
+        return heroList;
+    }
+
+    private String getHeroByGrade(Integer grade) {
+        QueryWrapper<Hero> queryWrapper = new QueryWrapper<>();
+        queryWrapper
+                .eq("attribute_cd","dark")
+                .or()
+                .eq("attribute_cd","light");
+        List<Hero> list = heroService.list(queryWrapper);
+        List<Hero> heroes = list.stream().filter(it -> Objects.equals(it.getGrade(), grade)).toList();
+        //随机取一个
+        if (!CollectionUtils.isEmpty(heroes)) {
+            Hero hero = heroes.get(new Random().nextInt(heroes.size()));
+            return hero.getCode();
+        }
+        return null;
+    }
 
     /**
      * OCR装备算分

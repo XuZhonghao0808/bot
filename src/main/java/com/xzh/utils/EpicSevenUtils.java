@@ -276,4 +276,21 @@ public class EpicSevenUtils {
         }
         return result;
     }
+
+    public static List<Integer> getTenStreaksOfMoonlight(int size) {
+        List<Integer> list = Lists.newArrayList();
+        for (int i = 0; i < size; i++) {
+            double randomNum = Math.random(); // 返回值范围在[0, 1)之间
+            if(0.025 >= randomNum) {
+                list.add(5);
+                continue;
+            }
+            if(0.275 >= randomNum) {
+                list.add(4);
+                continue;
+            }
+            list.add(3);
+        }
+        return list;
+    }
 }
