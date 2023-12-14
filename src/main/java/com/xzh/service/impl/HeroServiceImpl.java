@@ -8,13 +8,16 @@ import com.xzh.mapper.HeroMapper;
 import com.xzh.service.HeroService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.xzh.utils.HttpClientUtils;
+import com.xzh.utils.PinyinFuzzySearchUtil;
 import com.xzh.utils.Result;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * <p>
@@ -28,7 +31,7 @@ import java.util.List;
 public class HeroServiceImpl extends ServiceImpl<HeroMapper, Hero> implements HeroService {
 
     @Override
-    public Result getHeroCodeByName(String name) {
+    public Result getHeroCodeByEnName(String name) {
         QueryWrapper<Hero> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("en_name",name);
         List<Hero> list = this.list(queryWrapper);
@@ -37,6 +40,38 @@ public class HeroServiceImpl extends ServiceImpl<HeroMapper, Hero> implements He
         }
         Hero hero = list.get(0);
         return Result.success(hero);
+    }
+
+    @Override
+    public Result getHeroCodeByName(String name) {
+        QueryWrapper<Hero> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("name", name);
+        List<Hero> list = this.list(queryWrapper);
+        if (CollectionUtils.isEmpty(list)) {
+            //别名查询
+            List<Hero> heroList = this.list();
+            List<Hero> filterHeroList = heroList.stream().filter(hero -> matchAlias(hero.getName(),hero.getAlias(), name)).toList();
+            if (CollectionUtils.isEmpty(filterHeroList)) {
+                return Result.error().message("没找到");
+            }
+            return Result.success(filterHeroList.get(0));
+        }
+        Hero hero = list.get(0);
+        return Result.success(hero);
+    }
+
+    private boolean matchAlias(String name,String alias, String checkName) {
+        if(PinyinFuzzySearchUtil.chineseCharactersFuzzySearch(name,checkName)){
+            return true;
+        }
+        if(StringUtils.isEmpty(alias)){
+            return false;
+        }
+        String[] split = alias.split(",");
+        //别名查不到，再使用谐音查询
+        return Arrays.stream(split).anyMatch(it ->
+                Objects.equals(it, checkName)
+                        || PinyinFuzzySearchUtil.chineseCharactersFuzzySearch(it,checkName));
     }
 
     @Override

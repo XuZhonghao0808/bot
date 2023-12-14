@@ -31,7 +31,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
+
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.*;
+import java.net.URL;
 import java.text.DecimalFormat;
 import java.util.*;
 import java.util.List;
@@ -56,12 +60,23 @@ public class EpicSevenMessageListener {
     public synchronized void streaksOfMoonlight(GroupMessageEvent groupMessageEvent) {
         MessagesBuilder messagesBuilder = new MessagesBuilder();
         List<Integer> gradeList = EpicSevenUtils.getTenStreaksOfMoonlight(1);
-        String heroByGrade = getHeroByGrade(gradeList.get(0));
+        Pair<String, String> heroByGrade = getHeroByGrade(gradeList.get(0));
+        if(heroByGrade == null){
+            return;
+        }
         //图片合成
         try {
-            InputStream inputStream = ImageCompositingUtils.streaksOfMoonlight(heroByGrade);
-            messagesBuilder.image(Resource.of(inputStream));
-//            messagesBuilder.text(heroList.toString());
+            URL url = new URL("https://epic-seven.oss-cn-beijing.aliyuncs.com/Vp/"+heroByGrade.getKey()+".png");
+            if(url.openStream() == null){
+                messagesBuilder.text("没有立绘："+heroByGrade.getValue());
+            }else {
+                BufferedImage bufferedImage = ImageIO.read(url);
+                ByteArrayOutputStream os = new ByteArrayOutputStream();
+                ImageIO.write(bufferedImage, "png", os);
+                ByteArrayInputStream inputStream = new ByteArrayInputStream(os.toByteArray());
+                messagesBuilder.image(Resource.of(inputStream));
+            }
+
             groupMessageEvent.getGroup().sendAsync(messagesBuilder.build());
             return;
         } catch (Exception e) {
@@ -116,7 +131,7 @@ public class EpicSevenMessageListener {
         return heroList;
     }
 
-    private String getHeroByGrade(Integer grade) {
+    private Pair<String,String> getHeroByGrade(Integer grade) {
         QueryWrapper<Hero> queryWrapper = new QueryWrapper<>();
         queryWrapper
                 .eq("attribute_cd","dark")
@@ -127,7 +142,7 @@ public class EpicSevenMessageListener {
         //随机取一个
         if (!CollectionUtils.isEmpty(heroes)) {
             Hero hero = heroes.get(new Random().nextInt(heroes.size()));
-            return hero.getCode();
+            return Pair.of(hero.getCode(),hero.getName());
         }
         return null;
     }

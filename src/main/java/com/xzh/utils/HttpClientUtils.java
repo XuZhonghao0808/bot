@@ -142,4 +142,37 @@ public class HttpClientUtils {
         httpClient.getConnectionManager().shutdown();
         return result;
     }
+
+    /**
+     * 封装GET请求
+     *
+     * @param url
+     * @return
+     * @throws IOException
+     */
+    public static String get(String url, Map<String,String> hearderMap) throws IOException {
+//        1、创建HttpClient对象
+        HttpClient httpClient = HttpClientBuilder.create().build();
+//        2、创建请求方式的实例
+        HttpGet httpGet = new HttpGet(url);
+//        3、添加请求参数(设置请求和传输超时时间)
+        RequestConfig requestConfig = RequestConfig.custom().setSocketTimeout(60000).setConnectTimeout(60000).build();
+        httpGet.setConfig(requestConfig);
+        hearderMap.forEach(httpGet::addHeader);
+//        4、发送Http请求
+        HttpResponse response = httpClient.execute(httpGet);
+//        5、获取返回的内容
+        String result = null;
+        int statusCode = response.getStatusLine().getStatusCode();
+        if (200 == statusCode) {
+            result = EntityUtils.toString(response.getEntity());
+        } else {
+            logger.info("请求第三方接口出现错误，状态码为:{}", statusCode);
+            return null;
+        }
+//        6、释放资源
+        httpGet.abort();
+        httpClient.getConnectionManager().shutdown();
+        return result;
+    }
 }

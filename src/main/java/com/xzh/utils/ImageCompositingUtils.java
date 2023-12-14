@@ -353,23 +353,4 @@ public class ImageCompositingUtils {
         return new ByteArrayInputStream(os.toByteArray());
     }
 
-    public static InputStream streaksOfMoonlight(String heroCode) throws Exception {
-
-        // 创建一个 BufferedImage 对象
-        BufferedImage image = new BufferedImage(200, 89, BufferedImage.TYPE_INT_RGB);
-        Graphics2D graphics = image.createGraphics();
-
-        // 设置背景色和文本颜色
-        graphics.setColor(backgroundColor);
-        graphics.fillRect(0, 0, 200, 89);
-        graphics.setColor(fontColor);
-        URL url = new URL(ossPath+"/cachedimages/"+heroCode+"_l.png");
-        BufferedImage bufferedImage = ImageIO.read(url);
-        graphics.drawImage(bufferedImage,0,0,null);
-        // 释放资源
-        graphics.dispose();
-        ByteArrayOutputStream os = new ByteArrayOutputStream();
-        ImageIO.write(image, "png", os);
-        return new ByteArrayInputStream(os.toByteArray());
-    }
 }

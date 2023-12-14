@@ -15,6 +15,8 @@ import org.springframework.stereotype.Component;
  */
 public interface HeroService extends IService<Hero> {
 
+    public Result getHeroCodeByEnName(String enName);
+
     public Result getHeroCodeByName(String name);
 
     public Result initOrUpdate();
